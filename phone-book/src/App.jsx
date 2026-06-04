@@ -5,6 +5,7 @@ import { Filter } from './components/Filter'
 import {PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
 
+import peopleService from './services/People'
 
 
 
@@ -19,34 +20,67 @@ const App = () => {
   const [filterInput, setFilterInput] = useState('')
 
   useEffect(() =>{
-    axios.get("http://localhost:3001/persons")
-    .then(response => {
-      setPersons(response.data)
+    peopleService.getAll().then(res =>{
+      setPersons(res)
     })
 
   }, [])
+
+  const removePerson = (id) => {
+   // const filterOutId = persons.filter(p => p.id !== id) // keep all the ids that are not the id given
+   // const copyPerson = {...filterOutId} //Make a copy of the state variable
+
+   if(window.confirm("Do you want to delete?")){
+        peopleService.remove(id).then(res =>{
+      setPersons(persons.filter(p => p.id !== id))
+    })
+
+   } 
+
+
+
+  }
 
 
   const addInfo = (event) => {
     event.preventDefault()
 
-    //if that a person has the same name as the newName, then we know that there's a duplicate, so we say it already exists
-    const nameExists = persons.some((person) => person.name === newName)
+    //if the person exists, then get the person
+    const findPerson = persons.find((p) => p.name === newName)
+  
 
-    if(nameExists){
-      alert(`${newName} is already added to the phonebook`)
+    if(findPerson){
+      if(window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)){
+        const copyPerson = {...findPerson, number: newNumber}
+
+        peopleService.update(findPerson.id, copyPerson)
+        .then(res => { 
+          setPersons(persons.map(p => p.id === findPerson.id ? res : p))
+
+        })
+        setNewName('')
+        setNewNumber('')
+        
+
+
+  
+
+      }
 
     } else {
           const personObject = {
       name: newName,
-      id: String(persons.length+1),
       number: newNumber
     }
 
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
-    
+    peopleService.create(personObject).then(per =>{
+      setPersons(persons.concat(per))
+      setNewName('')
+      setNewNumber('')
+
+    })
+
+
 
       
     }
@@ -78,7 +112,7 @@ const App = () => {
       <PersonForm addInfo={addInfo} newName={newName} newNumber={newNumber} handleNewName={handleNewName} handleNewNumber={handleNewNumber} />
       
       <h2>Numbers</h2>
-      <Persons filterInput={filterInput} persons={persons}/>
+      <Persons filterInput={filterInput} persons={persons} removePerson={removePerson}/>
         
 
     </div>
