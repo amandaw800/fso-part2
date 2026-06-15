@@ -3,10 +3,16 @@ import Person from './Person'
 export const Persons = ({filterInput, persons, removePerson}) => {
   
 const filterInputs = () => {
+
   const query = filterInput.toLowerCase()
-  return persons.filter(person =>
-    (person.name ?? "").toLowerCase().includes(query)
-  )
+  return persons.filter(person =>{
+    if (!person) return false
+
+    if(typeof person.name !== "string") return false 
+
+    return person.name.toLowerCase().includes(query)
+  })
+  
 }
 
 

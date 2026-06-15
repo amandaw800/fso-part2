@@ -4,8 +4,10 @@ import Person from './components/Person'
 import { Filter } from './components/Filter'
 import {PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
-
 import peopleService from './services/People'
+import Notification from './components/Notification'
+import './index.css'
+
 
 
 
@@ -14,10 +16,9 @@ import peopleService from './services/People'
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
-
   const [newNumber, setNewNumber] = useState('')
-
   const [filterInput, setFilterInput] = useState('')
+  const [notifMessage, setNotifMessage] = useState(null)
 
   useEffect(() =>{
     peopleService.getAll().then(res =>{
@@ -55,16 +56,30 @@ const App = () => {
 
         peopleService.update(findPerson.id, copyPerson)
         .then(res => { 
+
+              if (!res || !res.id || !res.name || !res.number) {
+      throw new Error("Invalid update response")
+    }
+          
           setPersons(persons.map(p => p.id === findPerson.id ? res : p))
+          setNotifMessage(`Updated ${copyPerson.name}'s number to ${copyPerson.number}`)
+          setTimeout(() =>{
+            setNotifMessage(null)
+          }, 5000)
 
-        })
-        setNewName('')
-        setNewNumber('')
-        
+          setNewName('')
+          setNewNumber('')
 
+          
 
-  
+        }).catch(err => {
+          setNotifMessage(`Information of ${copyPerson.name} had already been removed from the server`)
+          setTimeout(() =>{
+            setNotifMessage(null)
+          }, 5000)
 
+        }
+        )
       }
 
     } else {
@@ -75,14 +90,12 @@ const App = () => {
 
     peopleService.create(personObject).then(per =>{
       setPersons(persons.concat(per))
+      setNotifMessage(`Added ${per.name}`)
       setNewName('')
       setNewNumber('')
 
     })
 
-
-
-      
     }
 
   }
@@ -101,12 +114,10 @@ const App = () => {
   }
 
  
-
-
-
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notifMessage}/>
       <Filter value={filterInput} onChange={handleFilterInput}/>
       <h2>add a new</h2>
       <PersonForm addInfo={addInfo} newName={newName} newNumber={newNumber} handleNewName={handleNewName} handleNewNumber={handleNewNumber} />
