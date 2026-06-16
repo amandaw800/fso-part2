@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import SearchBar from './components/SearchBar'
+import FilterResults from './components/FilterResults'
 
 
 
@@ -9,8 +10,8 @@ import SearchBar from './components/SearchBar'
 
 const App = () => {
 
-  const [country, setCountry] = useState("") //for each country in the search bar
-  const [countries, setCountries] = useState([]) //set the countries to display
+  const [country, setCountry] = useState("") //for each country the user inputs into the search bar
+  const [countries, setCountries] = useState([]) //for each country that is given from the API 
 
   useEffect(() =>{
     axios.get('https://studies.cs.helsinki.fi/restcountries/api/all')
@@ -29,16 +30,24 @@ const App = () => {
 
   }
 
+ const filterCountries = () => {
+  const inputLowercase = country.toLowerCase() //user input
+
+
+
+  return (
+    countries.filter(country => 
+      country.name.common.toLowerCase().includes(inputLowercase)
+    )
+  )
+  
+ }
+
 
   return(
     <div>
       <SearchBar onChange={handleNewCountry} text={"find countries"} inputId="search"/>
-      <div>
-        {countries.map(country =>( 
-          <div key={country.cca3}>{country.name.common}</div>
-        ))}
-        
-      </div>
+      <FilterResults countries={countries} country={country}/>
 
     </div>
   )
