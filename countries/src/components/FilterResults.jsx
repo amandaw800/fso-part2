@@ -23,7 +23,7 @@ const FilterResults = ({countries, country}) => {
       console.log(countryToDisplay)
       
       return (
-        <CountryDisplay countryToDisplay={countryToDisplay}/>
+        <CountryDisplay countryToDisplay={countryToDisplay} isActive={true} onClick={() => setShowCountryInfo(0)}/>
       )
 
 
@@ -35,9 +35,10 @@ const FilterResults = ({countries, country}) => {
     return (
       filteredInput.map(country => 
         <div key={country.cca3}>{country.name.common} 
-       {/*<button onClick={() => setShowCountryInfo(showCountryInfo === country.name.common ? null : country.name.common)}>Show</button> 
-            {showCountryInfo === country.name.common && (
-      <CountryDisplay countryToDisplay={country} />)} */}
+        <CountryDisplay countryToDisplay={country} isActive={showCountryInfo === country.name.common} onClick={() => setShowCountryInfo(showCountryInfo === country.name.common ? null : country.name.common)}/>
+        
+    
+      
      </div>
         
       )
