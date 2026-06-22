@@ -92,7 +92,7 @@ const App = () => {
       setPersons(persons.concat(per))
       setNotifMessage(`Added ${per.name}`)
       setNewName('')
-      setNewNumber('')
+      setNewNumber('') 
 
     })
 
